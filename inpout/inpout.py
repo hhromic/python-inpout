@@ -26,9 +26,9 @@ def decompressing_unpacker(path, **kwargs):
         yield unpacker(reader, **kwargs)
 
 @contextmanager
-def compressing_pack(path, **kwargs):
+def compressing_pack(path, level=None, **kwargs):
     """Create a compressing pack context manager (MessagePack-LZ4 format)."""
-    with compressor(path) as writer:
+    with compressor(path, level=level) as writer:
         pkr = packer(**kwargs)
         def _pack(obj):
             writer.write(pkr.pack(obj))
@@ -45,13 +45,13 @@ def load_iter(path, **kwargs):
         for obj in _unpacker:
             yield obj
 
-def save_obj(obj, path, **kwargs):
+def save_obj(obj, path, level=None, **kwargs):
     """Save an object to disk (MessagePack-LZ4 format)."""
-    with compressing_pack(path, **kwargs) as _pack:
+    with compressing_pack(path, level=level, **kwargs) as _pack:
         _pack(obj)
 
-def save_iter(iterable, path, **kwargs):
+def save_iter(iterable, path, level=None, **kwargs):
     """Save an iterable to disk (MessagePack-LZ4 format)."""
-    with compressing_pack(path, **kwargs) as _pack:
+    with compressing_pack(path, level=level, **kwargs) as _pack:
         for element in iterable:
             _pack(element)

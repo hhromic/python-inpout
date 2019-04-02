@@ -28,13 +28,13 @@ For saving/loading data using MessagePack and LZ4 compression, the following con
 
 * `load_obj(path, **kwargs)`: load a single object from the file in `path`. See below for `kwargs`.
 * `load_iter(path, **kwargs)`: iterate objects from the file in `path`. See below for `kwargs`.
-* `save_obj(obj, path, **kwargs)`: save a single object `obj` to a file in `path`. See below for `kwargs`.
-* `save_iter(iterable, path, **kwargs)`: save a interable `iterable` of objects to a file in `path`. See below for `kwargs`.
+* `save_obj(obj, path, level=None, **kwargs)`: save a single object `obj` to a file in `path`. See `compressor()` for `level` and below for `kwargs`.
+* `save_iter(iterable, path, level=None, **kwargs)`: save a interable `iterable` of objects to a file in `path`. See `compressor()` for `level` and below for `kwargs`.
 
 For more fine-grained control, the following context-aware functions are also provided:
 
 * `decompressing_unpacker(path, **kwargs)`: create a decompressing unpacker context manager to be used as a data reader. See below for `kwargs`.
-* `compressing_pack(path, **kwargs)`: create a compressing pack context manager to be used as a data writer. See below for `kwargs`.
+* `compressing_pack(path, level=None, **kwargs)`: create a compressing pack context manager to be used as a data writer. See `compressor()` for `level` and below for `kwargs`.
 
 If you want to pack data with MessagePack but without compression, you might use these functions directly:
 
@@ -45,7 +45,7 @@ If you want to pack data with MessagePack but without compression, you might use
 
 If you want to compress data using LZ4 without packing with MessagePack, you might use these context-aware functions directly:
 
-* `compressor(path, level=LZ4F_COMPRESSION_MAX)`: create a data compressing context manager for file writing to `path`. A compression level can be specified in `level`. Values lower than `3` (including negative ones) use fast compression. Recommended range for hc compression is between `4` and `9`. More information can be [found here](https://github.com/lz4/lz4/blob/dev/README.md).
+* `compressor(path, level=None)`: create a data compressing context manager for file writing to `path`. A compression level can be specified in `level` and defaults to `LZ4F_COMPRESSION_MAX` if `None`. Values lower than `3` (including negative ones) use fast compression. Recommended range for hc-type compression is between `4` and `9`. More information can be [found here](https://github.com/lz4/lz4/blob/dev/README.md).
 * `decompressor(path)`: create a data decompressing context manager for file reading from `path`.
 
 Functions involving data packing with MessagePack support optional keyword arguments (`kwargs`) to be passed directly to MessagePack. Useful options are described below:
