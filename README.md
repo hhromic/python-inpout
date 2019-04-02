@@ -24,31 +24,66 @@ To use the functionality of this library, simply import it in your Python progra
 
     import inpout
 
-For saving/loading data using MessagePack and LZ4 compression, the following convenience functions are provided:
+For saving/loading data using MessagePack and LZ4 compression, the following convenience functions are provided in the root namespace:
 
-* `load_obj(path, **kwargs)`: load a single object from the file in `path`. See below for `kwargs`.
-* `load_iter(path, **kwargs)`: iterate objects from the file in `path`. See below for `kwargs`.
-* `save_obj(obj, path, level=None, **kwargs)`: save a single object `obj` to a file in `path`. See `compressor()` for `level` and below for `kwargs`.
-* `save_iter(iterable, path, level=None, **kwargs)`: save a interable `iterable` of objects to a file in `path`. See `compressor()` for `level` and below for `kwargs`.
+* `load_obj(path, compression=None, **kwargs)`: return a single object loaded from a file on disk.
 
-For more fine-grained control, the following context-aware functions are also provided:
+  See `data_unpacker()` for details on the arguments.
 
-* `decompressing_unpacker(path, **kwargs)`: create a decompressing unpacker context manager to be used as a data reader. See below for `kwargs`.
-* `compressing_pack(path, level=None, **kwargs)`: create a compressing pack context manager to be used as a data writer. See `compressor()` for `level` and below for `kwargs`.
+* `load_iter(path, compression=None, **kwargs)`: return an iterator of objects loaded from a file on disk.
 
-If you want to pack data with MessagePack but without compression, you might use these functions directly:
+  See `data_unpacker()` for details on the arguments.
 
-* `pack(obj, stream, **kwargs)`: pack a single object `obj` using MessagePack (with extended types support) and write packed bytes to a stream of bytes in `stream`. See below for `kwargs`.
-* `packb(obj, **kwargs)`: pack a single object `obj` using MessagePack (with extended types support) and return packed bytes. See below for `kwargs`.
-* `unpack(stream, **kwargs)`: unpack a stream of packed bytes in `stream` using MessagePack (with extended types support) and return a single unpacked object. See below for `kwargs`.
-* `unpackb(packed, **kwargs)`: unpack packed bytes using MessagePack (with extended types support) in `packed` and return a single unpacked object. See below for `kwargs`.
+* `save_obj(obj, path, compression=None, level=None, **kwargs)`: save a single object `obj` to a file on disk.
 
-If you want to compress data using LZ4 without packing with MessagePack, you might use these context-aware functions directly:
+  See `data_pack()` for details on the arguments.
 
-* `compressor(path, level=None)`: create a data compressing context manager for file writing to `path`. A compression level can be specified in `level` and defaults to `LZ4F_COMPRESSION_MAX` if `None`. Values lower than `3` (including negative ones) use fast compression. Recommended range for hc-type compression is between `4` and `9`. More information can be [found here](https://github.com/lz4/lz4/blob/dev/README.md).
-* `decompressor(path)`: create a data decompressing context manager for file reading from `path`.
+* `save_iter(iterable, path, compression=None, level=None, **kwargs)`: save an interable of objects `iterable` to a file on disk.
 
-Functions involving data packing with MessagePack support optional keyword arguments (`kwargs`) to be passed directly to MessagePack. Useful options are described below:
+  See `data_pack()` for details on the arguments.
+
+For more fine-grained control, the following context-manager functions are also provided:
+
+* `data_unpacker(path, compression=None, **kwargs)`: create a data unpacker (MessagePack) context manager with optional compression (LZ4) support to be used as a reader.
+  - `path`: path to the file on disk containing the data to read.
+  - `compression`: boolean flag for using LZ4 compression. If `None`, defaults to `True`.
+  - `kwargs`: keyword arguments passed directly to the MessagePack unpacker. See below.
+
+* `data_pack(path, compression=None, level=None, **kwargs)`: create a data pack (MessagePack) context manager with optional compression (LZ4) support to be used as a writer.
+  - `path`: path to the file on disk that will contain the written data.
+  - `compression`: boolean flag for using LZ4 compression. If `None`, defaults to `True`.
+  - `level`: the compression level for the LZ4 compressor. See `compressor()` for details.
+  - `kwargs`: keyword arguments passed directly to the MessagePack packer. See below.
+
+For packing data with MessagePack more directly, the following functions are provided in `inpout.packing`:
+
+* `pack(obj, stream, **kwargs)`: pack a single object using MessagePack (with extended types support) to a stream of bytes.
+  - `obj`: the object to pack.
+  - `stream`: the bytes stream to use for writting data.
+  - `kwargs`: keyword arguments passed directly to the MessagePack packer. See below.
+
+* `packb(obj, **kwargs)`: pack a single object using MessagePack (with extended types support) and return packed bytes.
+  - `obj`: the object to pack.
+  - `kwargs`: keyword arguments passed directly to the MessagePack packer. See below.
+
+* `unpack(stream, **kwargs)`: unpack a stream of packed bytes using MessagePack (with extended types support) and return a single unpacked object.
+  - `stream`: the bytes stream to use for reading data.
+  - `kwargs`: keyword arguments passed directly to the MessagePack unpacker. See below.
+
+* `unpackb(packed, **kwargs)`: unpack packed bytes using MessagePack (with extended types support) and return a single unpacked object.
+  - `packed`: the packed bytes to unpack.
+  - `kwargs`: keyword arguments passed directly to the MessagePack unpacker. See below.
+
+For compressing data with LZ4 more directly, the following context-manager functions are provided in `inpout.compression`:
+
+* `decompressor(path)`: create a data decompressing context manager to be used as reader.
+  - `path`: path to the file on disk containing the compressed data.
+
+* `compressor(path, level=None)`: create a data compressing context manager to be used as a writer.
+  - `path`: path to the file on disk that will contain the compressed data.
+  - `level`: compression level to use. Defaults to `LZ4F_COMPRESSION_MAX` if `None`. Values lower than `3` (including negative ones) use fast compression. Recommended range for hc-type compression is between `4` and `9`. More information can be [found here](https://github.com/lz4/lz4/blob/dev/README.md).
+
+Functions involving data packing with MessagePack support optional keyword arguments `kwargs` to be passed directly to MessagePack. Useful options are described below:
 
 * `use_list`: can be `True` (default) or `False`. List is the default sequence type of Python. But tuples are lighter than lists. You can use `use_list=False` while unpacking when performance is important for your program. Python objects that require hashable elements such as `dict` or `set` can't use lists as key, therefore `use_list=False` is required for unpacking data containing tuples as keys.
 
@@ -90,13 +125,23 @@ for obj in inpout.load_iter("test2.mp.lz4"):
 data = inpout.load_obj("test3.mp.lz4", use_list=False)
 print("DATA=%r" % (data,))
 
-# demonstrate the compressing pack function
-with inpout.compressing_pack("test4.mp.lz4") as pack:
+# demonstrate the data pack function
+with inpout.data_pack("test4.mp.lz4") as pack:
     for obj in (obj1, obj2, obj3, obj4, obj5, obj6):
         pack(obj)
 
-# demonstrate the decompressing unpacker
-with inpout.decompressing_unpacker("test4.mp.lz4", use_list=False) as reader:
+# demonstrate the data unpacker function
+with inpout.data_unpacker("test4.mp.lz4", use_list=False) as reader:
+    for obj in reader:
+        print("OBJ=%r" % (obj,))
+
+# demonstrate the data pack function (no compression)
+with inpout.data_pack("test4.mp", compression=False) as pack:
+    for obj in (obj1, obj2, obj3, obj4, obj5, obj6):
+        pack(obj)
+
+# demonstrate the data unpacker function (no compression)
+with inpout.data_unpacker("test4.mp", compression=False, use_list=False) as reader:
     for obj in reader:
         print("OBJ=%r" % (obj,))
 ```

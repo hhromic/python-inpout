@@ -21,8 +21,8 @@ from . import compression
 from . import packing
 from . import ext_types
 from .inpout import (
-    decompressing_unpacker,
-    compressing_pack,
+    data_unpacker,
+    data_pack,
     load_obj,
     load_iter,
     save_obj,

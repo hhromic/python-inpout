@@ -20,38 +20,42 @@ from .compression import decompressor, compressor
 from .packing import unpacker, packer
 
 @contextmanager
-def decompressing_unpacker(path, **kwargs):
-    """Create a decompressing unpacker context manager (MessagePack-LZ4 format)."""
-    with decompressor(path) as reader:
+def data_unpacker(path, compression=None, **kwargs):
+    """Create a data unpacker (MessagePack) context manager with
+       optional compression (LZ4) support."""
+    compression = True if compression is None else compression
+    with decompressor(path) if compression else open(path, "rb") as reader:
         yield unpacker(reader, **kwargs)
 
 @contextmanager
-def compressing_pack(path, level=None, **kwargs):
-    """Create a compressing pack context manager (MessagePack-LZ4 format)."""
-    with compressor(path, level=level) as writer:
+def data_pack(path, compression=None, level=None, **kwargs):
+    """Create a data pack (MessagePack) context manager with
+       optional compression (LZ4) support."""
+    compression = True if compression is None else compression
+    with compressor(path, level=level) if compression else open(path, "wb") as writer:
         pkr = packer(**kwargs)
         def _pack(obj):
             writer.write(pkr.pack(obj))
         yield _pack
 
-def load_obj(path, **kwargs):
-    """Load an object from disk (MessagePack-LZ4 format)."""
-    with decompressing_unpacker(path, **kwargs) as _unpacker:
+def load_obj(path, compression=None, **kwargs):
+    """Load an object from disk."""
+    with data_unpacker(path, compression=compression, **kwargs) as _unpacker:
         return next(_unpacker)
 
-def load_iter(path, **kwargs):
+def load_iter(path, compression=None, **kwargs):
     """Iterate objects from disk (MessagePack-LZ4 format)."""
-    with decompressing_unpacker(path, **kwargs) as _unpacker:
+    with data_unpacker(path, compression=compression, **kwargs) as _unpacker:
         for obj in _unpacker:
             yield obj
 
-def save_obj(obj, path, level=None, **kwargs):
+def save_obj(obj, path, compression=None, level=None, **kwargs):
     """Save an object to disk (MessagePack-LZ4 format)."""
-    with compressing_pack(path, level=level, **kwargs) as _pack:
+    with data_pack(path, compression=compression, level=level, **kwargs) as _pack:
         _pack(obj)
 
-def save_iter(iterable, path, level=None, **kwargs):
+def save_iter(iterable, path, compression=None, level=None, **kwargs):
     """Save an iterable to disk (MessagePack-LZ4 format)."""
-    with compressing_pack(path, level=level, **kwargs) as _pack:
+    with data_pack(path, compression=compression, level=level, **kwargs) as _pack:
         for element in iterable:
             _pack(element)
