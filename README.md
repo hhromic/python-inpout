@@ -24,7 +24,10 @@ To use the functionality of this library, simply import it in your Python progra
 
     import inpout
 
-For saving/loading data using MessagePack and LZ4 compression, the following convenience functions are provided in the root namespace:
+
+### High-Level Functions
+
+For saving/loading data using MessagePack and LZ4 compression, the following high-level convenience functions are provided in the root namespace:
 
 * `load_obj(path, compression=None, **kwargs)`: return a single object loaded from a file on disk.
 
@@ -42,20 +45,25 @@ For saving/loading data using MessagePack and LZ4 compression, the following con
 
   See `data_pack()` for details on the arguments.
 
-For more fine-grained control, the following context-manager functions are also provided:
 
-* `data_unpacker(path, compression=None, **kwargs)`: create a data unpacker (MessagePack) context manager with optional compression (LZ4) support to be used as a reader.
+### Context Manager Functions
+
+For more flexibility, the following context manager functions are provided in the root namespace:
+
+* `data_unpacker(path, compression=None, **kwargs)`: create a data unpacker (MessagePack) context manager with optional compression (LZ4) support to be used as an iterable unpacker.
   - `path`: path to the file on disk containing the data to read.
   - `compression`: boolean flag for using LZ4 compression. If `None`, defaults to `True`.
   - `kwargs`: keyword arguments passed directly to the MessagePack unpacker. See below.
 
-* `data_pack(path, compression=None, level=None, **kwargs)`: create a data pack (MessagePack) context manager with optional compression (LZ4) support to be used as a writer.
+* `data_pack(path, compression=None, level=None, **kwargs)`: create a data pack (MessagePack) context manager with optional compression (LZ4) support to be used as a packing function.
   - `path`: path to the file on disk that will contain the written data.
   - `compression`: boolean flag for using LZ4 compression. If `None`, defaults to `True`.
   - `level`: the compression level for the LZ4 compressor. See `compressor()` for details.
   - `kwargs`: keyword arguments passed directly to the MessagePack packer. See below.
 
-For packing data with MessagePack more directly, the following functions are provided in `inpout.packing`:
+### Packing Functions
+
+For packing/unpacking data with MessagePack directly without compression, the following functions are provided in `inpout.packing`:
 
 * `pack(obj, stream, **kwargs)`: pack a single object using MessagePack (with extended types support) to a stream of bytes.
   - `obj`: the object to pack.
@@ -74,7 +82,9 @@ For packing data with MessagePack more directly, the following functions are pro
   - `packed`: the packed bytes to unpack.
   - `kwargs`: keyword arguments passed directly to the MessagePack unpacker. See below.
 
-For compressing data with LZ4 more directly, the following context-manager functions are provided in `inpout.compression`:
+### Compressing Functions
+
+For compressing/decompressing arbitrary data with LZ4 directly without packing, the following context manager functions are provided in `inpout.compression`:
 
 * `decompressor(path)`: create a data decompressing context manager to be used as reader.
   - `path`: path to the file on disk containing the compressed data.
@@ -83,9 +93,13 @@ For compressing data with LZ4 more directly, the following context-manager funct
   - `path`: path to the file on disk that will contain the compressed data.
   - `level`: compression level to use. Defaults to `LZ4F_COMPRESSION_MAX` if `None`. Values lower than `3` (including negative ones) use fast compression. Recommended range for hc-type compression is between `4` and `9`. More information can be [found here](https://github.com/lz4/lz4/blob/dev/README.md).
 
-Functions involving data packing with MessagePack support optional keyword arguments `kwargs` to be passed directly to MessagePack. Useful options are described below:
+### Keyword Arguments for MessagePack
 
-* `use_list`: can be `True` (default) or `False`. List is the default sequence type of Python. But tuples are lighter than lists. You can use `use_list=False` while unpacking when performance is important for your program. Python objects that require hashable elements such as `dict` or `set` can't use lists as key, therefore `use_list=False` is required for unpacking data containing tuples as keys.
+Functions involving data packing with MessagePack support optional keyword arguments `kwargs` to be passed directly to MessagePack packer and unpacker. Useful options are described below:
+
+* `use_list`: can be `True` (default) or `False`.
+
+  List is the default sequence/array type for Python. But tuples are lighter than lists. You can use `use_list=False` while unpacking when performance is important for your program. Python objects that require hashable elements such as `dict` or `set` can't use lists as key, therefore `use_list=False` is required for unpacking data containing tuples as keys.
 
 ## Examples
 
@@ -131,8 +145,8 @@ with inpout.data_pack("test4.mp.lz4") as pack:
         pack(obj)
 
 # demonstrate the data unpacker function
-with inpout.data_unpacker("test4.mp.lz4", use_list=False) as reader:
-    for obj in reader:
+with inpout.data_unpacker("test4.mp.lz4", use_list=False) as unpacker:
+    for obj in unpacker:
         print("OBJ=%r" % (obj,))
 
 # demonstrate the data pack function (no compression)
@@ -141,8 +155,8 @@ with inpout.data_pack("test4.mp", compression=False) as pack:
         pack(obj)
 
 # demonstrate the data unpacker function (no compression)
-with inpout.data_unpacker("test4.mp", compression=False, use_list=False) as reader:
-    for obj in reader:
+with inpout.data_unpacker("test4.mp", compression=False, use_list=False) as unpacker:
+    for obj in unpacker:
         print("OBJ=%r" % (obj,))
 ```
 
