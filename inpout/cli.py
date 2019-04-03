@@ -25,7 +25,8 @@ def pprint():
     for fname in sys.argv[1:]:
         sys.stderr.write("Processing file '%s' ...\n" % fname)
         try:
-            for obj in load_iter(fname, use_list=False):
+            compression = fname.lower().endswith(".lz4")
+            for obj in load_iter(fname, compression=compression, use_list=False):
                 pprinter.pprint(obj)
         except Exception as excp:  # pylint: disable=broad-except
             sys.stderr.write("%s\n" % excp)
