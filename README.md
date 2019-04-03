@@ -67,7 +67,7 @@ For packing/unpacking data with MessagePack directly without compression, the fo
 
 * `pack(obj, stream, **kwargs)`: pack a single object using MessagePack (with extended types support) to a stream of bytes.
   - `obj`: the object to pack.
-  - `stream`: the bytes stream to use for writting data.
+  - `stream`: the bytes stream to use for writing data.
   - `kwargs`: keyword arguments passed directly to the MessagePack packer. See below.
 
 * `packb(obj, **kwargs)`: pack a single object using MessagePack (with extended types support) and return packed bytes.
