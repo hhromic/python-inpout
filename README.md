@@ -164,8 +164,8 @@ with inpout.data_unpacker("test4.mp", compression=False, use_list=False) as unpa
 
 This library supports MessagePack extended types and includes encoders/decoders for two standard Python objects: `set` (typecode `127`) and `datetime` (typecode `126`). These are automatically registered upon importing the library.
 
-* `set` objects are serialised as tuples containing their elements, therefore `use_list=False` must be used when deserialising data with `set` objects.
-* `datetime` objects are serialised as a floating point number counting the number of seconds since the UNIX epoch (00:00:00 on January 1, 1970). Timezone information is used correctly for serialisation but not stored, therefore they will be re-created as naive `datetime` objects, i.e. without timezone.
+* `set` objects are serialised as tuples containing their elements and reconstructed from these stored tuples.
+* `datetime` objects are serialised as a tuple of two integers `(seconds, microseconds)` representing the number of seconds and microseconds since the UNIX epoch (00:00:00 Thursday, 1 January 1970). Timezone information is used for the conversion but not stored, therefore `datetime` objects are reconstructed as naive, i.e. without timezone.
 
 You can also easily create your own encoders/decoders for Python objects and register them for this library to be used during serialisation/deserialisation:
 

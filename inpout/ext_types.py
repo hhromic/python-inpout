@@ -28,9 +28,11 @@ def decode_set(data, unpackb=msgpack.unpackb):
 
 def encode_datetime(obj, typecode, packb=msgpack.packb, ext_type=msgpack.ExtType):
     """Encode a Python 'datetime' object into a MessagePack ExtType."""
-    data = (obj - datetime(1970, 1, 1, tzinfo=obj.tzinfo)).total_seconds()
+    delta = obj - datetime(1970, 1, 1, tzinfo=obj.tzinfo)
+    data = delta.seconds + delta.days * 24 * 3600, delta.microseconds
     return ext_type(typecode, packb(data))
 
 def decode_datetime(data, unpackb=msgpack.unpackb):
     """Decode MessagePack data into a Python 'datetime' object."""
-    return datetime.utcfromtimestamp(unpackb(data))
+    seconds, microseconds = unpackb(data)
+    return datetime.utcfromtimestamp(seconds).replace(microsecond=microseconds)
