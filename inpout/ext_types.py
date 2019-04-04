@@ -16,23 +16,22 @@
 """Encoders/decoders for Python types to be used with MessagePack (https://msgpack.org/)."""
 
 from datetime import datetime
-import msgpack
 
-def encode_set(obj, typecode, packb=msgpack.packb, ext_type=msgpack.ExtType):
+def encode_set(obj, typecode, packb, ext_type):
     """Encode a Python 'set' object into a MessagePack ExtType."""
     return ext_type(typecode, packb(tuple(obj)))
 
-def decode_set(data, unpackb=msgpack.unpackb):
+def decode_set(data, unpackb):
     """Decode MessagePack data into a Python 'set' object."""
     return set(unpackb(data, use_list=False))
 
-def encode_datetime(obj, typecode, packb=msgpack.packb, ext_type=msgpack.ExtType):
+def encode_datetime(obj, typecode, packb, ext_type):
     """Encode a Python 'datetime' object into a MessagePack ExtType."""
     delta = obj - datetime(1970, 1, 1, tzinfo=obj.tzinfo)
     data = delta.seconds + delta.days * 24 * 3600, delta.microseconds
     return ext_type(typecode, packb(data))
 
-def decode_datetime(data, unpackb=msgpack.unpackb):
+def decode_datetime(data, unpackb):
     """Decode MessagePack data into a Python 'datetime' object."""
     seconds, microseconds = unpackb(data)
     return datetime.utcfromtimestamp(seconds).replace(microsecond=microseconds)
