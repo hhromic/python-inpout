@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 NAME = "inpout"
-VERSION = "1.0.4"
+VERSION = "1.0.5"
 DESCRIPTION = "Simple input/output using MessagePack and LZ4 for Python"
 AUTHOR = "Hugo Hromic"
 AUTHOR_EMAIL = "hhromic@gmail.com"
