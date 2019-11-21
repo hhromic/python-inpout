@@ -55,10 +55,11 @@ For more flexibility, the following context manager functions are provided in th
   - `compression`: boolean flag for using LZ4 compression.
   - `kwargs`: keyword arguments passed directly to the MessagePack unpacker. See below.
 
-* `data_pack(path, compression=True, level=None, **kwargs)`: create a data pack (MessagePack) context manager with optional compression (LZ4) support to be used as a packing function.
+* `data_pack(path, compression=True, level=None, append=False, **kwargs)`: create a data pack (MessagePack) context manager with optional compression (LZ4) support to be used as a packing function.
   - `path`: path to the file on disk that will contain the written data.
   - `compression`: boolean flag for using LZ4 compression.
   - `level`: the compression level for the LZ4 compressor. See `compressor()` for details.
+  - `append`: the append mode flag for the LZ4 compressor. See `compressor()` for details.
   - `kwargs`: keyword arguments passed directly to the MessagePack packer. See below.
 
 ### Packing Functions
@@ -89,9 +90,10 @@ For compressing/decompressing arbitrary data with LZ4 directly without packing, 
 * `decompressor(path)`: create a data decompressing context manager to be used as reader.
   - `path`: path to the file on disk containing the compressed data.
 
-* `compressor(path, level=None)`: create a data compressing context manager to be used as a writer.
+* `compressor(path, level=None, append=False)`: create a data compressing context manager to be used as a writer.
   - `path`: path to the file on disk that will contain the compressed data.
   - `level`: compression level to use. Defaults to `LZ4F_COMPRESSION_MAX` if `None`. Values lower than `3` (including negative ones) use fast compression. Recommended range for hc-type compression is between `4` and `9`. More information can be [found here](https://github.com/lz4/lz4/blob/dev/README.md).
+  - `append`: boolean flag for opening the file on disk in appending mode.
 
 ### Keyword Arguments for MessagePack
 

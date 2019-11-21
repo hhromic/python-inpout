@@ -49,11 +49,12 @@ class _ReadableDecompressor(Decompressor):
         return bytes(data_buffer[0:bytes_read])
 
 @contextmanager
-def compressor(path, level=None):
+def compressor(path, level=None, append=False):
     """Create a data compressing context manager for file writing.
-       When 'level' is None, a default LZ4F_COMPRESSION_MAX level is used."""
+       When 'level' is None, a default LZ4F_COMPRESSION_MAX level is used.
+       When 'append' is True, the open mode is set for appending data."""
     level = LZ4F_COMPRESSION_MAX if level is None else level
-    with open(path, "wb") as writer:
+    with open(path, "ab" if append else "wb") as writer:
         with _WritableCompressor(writer, level=level) as context:
             yield context
 

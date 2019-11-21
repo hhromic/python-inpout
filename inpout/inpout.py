@@ -27,10 +27,14 @@ def data_unpacker(path, compression=True, **kwargs):
         yield unpacker(reader, **kwargs)
 
 @contextmanager
-def data_pack(path, compression=True, level=None, **kwargs):
+def data_pack(path, compression=True, level=None, append=False, **kwargs):
     """Create a data pack (MessagePack) context manager with
-       optional compression (LZ4) support."""
-    with compressor(path, level=level) if compression else open(path, "wb") as writer:
+       optional compression (LZ4) support and file appending."""
+    if compression:
+        context = compressor(path, level=level, append=append)
+    else:
+        context = open(path, "ab" if append else "wb")
+    with context as writer:
         pkr = packer(**kwargs)
         def _pack(obj):
             writer.write(pkr.pack(obj))
