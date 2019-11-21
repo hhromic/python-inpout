@@ -50,14 +50,14 @@ For saving/loading data using MessagePack and LZ4 compression, the following hig
 
 For more flexibility, the following context manager functions are provided in the root namespace:
 
-* `data_unpacker(path, compression=None, **kwargs)`: create a data unpacker (MessagePack) context manager with optional compression (LZ4) support to be used as an iterable unpacker.
+* `data_unpacker(path, compression=True, **kwargs)`: create a data unpacker (MessagePack) context manager with optional compression (LZ4) support to be used as an iterable unpacker.
   - `path`: path to the file on disk containing the data to read.
-  - `compression`: boolean flag for using LZ4 compression. If `None`, defaults to `True`.
+  - `compression`: boolean flag for using LZ4 compression.
   - `kwargs`: keyword arguments passed directly to the MessagePack unpacker. See below.
 
-* `data_pack(path, compression=None, level=None, **kwargs)`: create a data pack (MessagePack) context manager with optional compression (LZ4) support to be used as a packing function.
+* `data_pack(path, compression=True, level=None, **kwargs)`: create a data pack (MessagePack) context manager with optional compression (LZ4) support to be used as a packing function.
   - `path`: path to the file on disk that will contain the written data.
-  - `compression`: boolean flag for using LZ4 compression. If `None`, defaults to `True`.
+  - `compression`: boolean flag for using LZ4 compression.
   - `level`: the compression level for the LZ4 compressor. See `compressor()` for details.
   - `kwargs`: keyword arguments passed directly to the MessagePack packer. See below.
 

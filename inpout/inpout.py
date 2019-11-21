@@ -20,18 +20,16 @@ from .compression import decompressor, compressor
 from .packing import unpacker, packer
 
 @contextmanager
-def data_unpacker(path, compression=None, **kwargs):
+def data_unpacker(path, compression=True, **kwargs):
     """Create a data unpacker (MessagePack) context manager with
        optional compression (LZ4) support."""
-    compression = True if compression is None else compression
     with decompressor(path) if compression else open(path, "rb") as reader:
         yield unpacker(reader, **kwargs)
 
 @contextmanager
-def data_pack(path, compression=None, level=None, **kwargs):
+def data_pack(path, compression=True, level=None, **kwargs):
     """Create a data pack (MessagePack) context manager with
        optional compression (LZ4) support."""
-    compression = True if compression is None else compression
     with compressor(path, level=level) if compression else open(path, "wb") as writer:
         pkr = packer(**kwargs)
         def _pack(obj):
