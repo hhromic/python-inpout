@@ -29,21 +29,21 @@ To use the functionality of this library, simply import it in your Python progra
 
 For saving/loading data using MessagePack and LZ4 compression, the following high-level convenience functions are provided in the root namespace:
 
-* `load_obj(path, compression=None, **kwargs)`: return a single object loaded from a file on disk.
+* `load_obj(path, **kwargs)`: return a single object loaded from a file on disk.
 
-  See `data_unpacker()` for details on the arguments.
+  See `data_unpacker()` for details on the keyword-arguments.
 
-* `load_iter(path, compression=None, **kwargs)`: return an iterator of objects loaded from a file on disk.
+* `load_iter(path, **kwargs)`: return an iterator of objects loaded from a file on disk.
 
-  See `data_unpacker()` for details on the arguments.
+  See `data_unpacker()` for details on the keyword-arguments.
 
-* `save_obj(obj, path, compression=None, level=None, **kwargs)`: save a single object `obj` to a file on disk.
+* `save_obj(obj, path, **kwargs)`: save a single object `obj` to a file on disk.
 
-  See `data_pack()` for details on the arguments.
+  See `data_pack()` for details on the keyword-arguments.
 
-* `save_iter(iterable, path, compression=None, level=None, **kwargs)`: save an interable of objects `iterable` to a file on disk.
+* `save_iter(iterable, path, **kwargs)`: save an interable of objects `iterable` to a file on disk.
 
-  See `data_pack()` for details on the arguments.
+  See `data_pack()` for details on the keyword-arguments.
 
 
 ### Context Manager Functions

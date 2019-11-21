@@ -38,24 +38,24 @@ def data_pack(path, compression=None, level=None, **kwargs):
             writer.write(pkr.pack(obj))
         yield _pack
 
-def load_obj(path, compression=None, **kwargs):
+def load_obj(path, **kwargs):
     """Load an object from disk."""
-    with data_unpacker(path, compression=compression, **kwargs) as _unpacker:
+    with data_unpacker(path, **kwargs) as _unpacker:
         return next(_unpacker)
 
-def load_iter(path, compression=None, **kwargs):
+def load_iter(path, **kwargs):
     """Iterate objects from disk (MessagePack-LZ4 format)."""
-    with data_unpacker(path, compression=compression, **kwargs) as _unpacker:
+    with data_unpacker(path, **kwargs) as _unpacker:
         for obj in _unpacker:
             yield obj
 
-def save_obj(obj, path, compression=None, level=None, **kwargs):
+def save_obj(obj, path, **kwargs):
     """Save an object to disk (MessagePack-LZ4 format)."""
-    with data_pack(path, compression=compression, level=level, **kwargs) as _pack:
+    with data_pack(path, **kwargs) as _pack:
         _pack(obj)
 
-def save_iter(iterable, path, compression=None, level=None, **kwargs):
+def save_iter(iterable, path, **kwargs):
     """Save an iterable to disk (MessagePack-LZ4 format)."""
-    with data_pack(path, compression=compression, level=level, **kwargs) as _pack:
+    with data_pack(path, **kwargs) as _pack:
         for element in iterable:
             _pack(element)
