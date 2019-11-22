@@ -24,27 +24,25 @@ To use the functionality of this library, simply import it in your Python progra
 
     import inpout
 
-
 ### High-Level Functions
 
 For saving/loading data using MessagePack and LZ4 compression, the following high-level convenience functions are provided in the root namespace:
 
 * `load_obj(path, **kwargs)`: return a single object loaded from a file on disk.
 
-  See `data_unpacker()` for details on the keyword-arguments.
+  See `data_unpacker()` for details on the keyword arguments.
 
 * `load_iter(path, **kwargs)`: return an iterator of objects loaded from a file on disk.
 
-  See `data_unpacker()` for details on the keyword-arguments.
+  See `data_unpacker()` for details on the keyword arguments.
 
 * `save_obj(obj, path, **kwargs)`: save a single object `obj` to a file on disk.
 
-  See `data_pack()` for details on the keyword-arguments.
+  See `data_pack()` for details on the keyword arguments.
 
 * `save_iter(iterable, path, **kwargs)`: save an interable of objects `iterable` to a file on disk.
 
-  See `data_pack()` for details on the keyword-arguments.
-
+  See `data_pack()` for details on the keyword arguments.
 
 ### Context Manager Functions
 
@@ -55,11 +53,11 @@ For more flexibility, the following context manager functions are provided in th
   - `compression`: boolean flag for using LZ4 compression.
   - `kwargs`: keyword arguments passed directly to the MessagePack unpacker. See below.
 
-* `data_pack(path, compression=True, level=None, append=False, **kwargs)`: create a data pack (MessagePack) context manager with optional compression (LZ4) support to be used as a packing function.
+* `data_pack(path, compression=True, level=None, append=False, **kwargs)`: create a data pack (MessagePack) context manager with optional compression (LZ4) support and file appending to be used as a packing function.
   - `path`: path to the file on disk that will contain the written data.
   - `compression`: boolean flag for using LZ4 compression.
   - `level`: the compression level for the LZ4 compressor. See `compressor()` for details.
-  - `append`: the append mode flag for the LZ4 compressor. See `compressor()` for details.
+  - `append`: boolean flag for opening the file on disk in appending mode.
   - `kwargs`: keyword arguments passed directly to the MessagePack packer. See below.
 
 ### Packing Functions
@@ -125,6 +123,10 @@ inpout.save_obj((obj1, obj2, obj3, obj4, obj5), "test1.mp.lz4")
 # save all the above objects in order to disk one by one (iterator)
 iterator = (o for o in (obj1, obj2, obj3, obj4, obj5))
 inpout.save_iter(iterator, "test2.mp.lz4")
+
+# append more data to the same test file (save_obj and save_iter can be mixed)
+inpout.save_obj(obj1, "test2.mp.lz4", append=True)
+inpout.save_iter((obj2, obj3), "test2.mp.lz4", append=True)
 
 # save an object with a tuple as key to demonstrate 'use_list=False'
 inpout.save_obj(obj6, "test3.mp.lz4")
