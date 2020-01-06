@@ -16,17 +16,28 @@
 """Command-line tools."""
 
 import sys
+from argparse import ArgumentParser
 from pprint import PrettyPrinter
 from .inpout import load_iter
 
 def pprint():
-    """Pretty-print files."""
+    """Pretty-print files in MsgPack format with optional compression."""
+    parser = ArgumentParser(description=pprint.__doc__)
+    parser.add_argument("filenames", metavar="FILENAME", nargs="+",
+                        help="an input filename to pretty-print")
+    parser.add_argument("-n", metavar="NUMBER", type=int,
+                        help="only process the first NUMBER objects"
+                             " from each input file")
+    args = parser.parse_args()
+
+    # read and pretty-print the given input files
     pprinter = PrettyPrinter()
-    for fname in sys.argv[1:]:
+    for fname in args.filenames:
         sys.stderr.write("Processing file '%s' ...\n" % fname)
         try:
             compression = fname.lower().endswith(".lz4")
-            for obj in load_iter(fname, compression=compression, use_list=False):
-                pprinter.pprint(obj)
+            for cnt, obj in enumerate(load_iter(fname, compression=compression, use_list=False)):
+                if args.n is None or cnt < args.n:
+                    pprinter.pprint(obj)
         except Exception as excp:  # pylint: disable=broad-except
             sys.stderr.write("%s\n" % excp)
